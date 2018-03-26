@@ -12,5 +12,18 @@
     "express": "~4.16.0",
     "http-errors": "~1.6.2",
     "morgan": "~1.9.0"
-  }
+  },
+  "description": "A platform to felicitate companies provide their non-billable resources on a contract basis.",
+  "main": "app.js",
+  "devDependencies": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/subrat1108/ResourceAug.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/subrat1108/ResourceAug/issues"
+  },
+  "homepage": "https://github.com/subrat1108/ResourceAug#readme"
 }
