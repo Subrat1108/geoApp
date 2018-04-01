@@ -1,0 +1,10 @@
+<div class="container">
+    <form class="form-auth" ng-submit="register()">
+      <input type="text" ng-model="user.userName" placeholder="eg: subrat">
+      <input type="text" ng-model="user.company" placeholder="eg: Recro">
+      <input type="email" ng-model="user.email" placeholder="eg: subrat@xyz.abc">
+      <input type="password" ng-model="user.password" placeholder="password">
+      <input type="submit" value="register" class="btn btn-primary" />
+      <p>{{error_message}}</p>
+    </form>
+</div>

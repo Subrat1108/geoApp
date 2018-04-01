@@ -11,16 +11,14 @@
     <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.6/angular.min.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.6/angular-route.js"></script>
     <script src ="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.6/angular-cookies.js"></script>
-    <script src="/javascript/augapp.js"></script>
-    <script src="https://cdn.firebase.com/libs/firebaseui/2.5.1/firebaseui.js"></script>
-<link type="text/css" rel="stylesheet" href="https://cdn.firebase.com/libs/firebaseui/2.5.1/firebaseui.css" />
+    <link href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/css/bootstrap-combined.min.css" rel="stylesheet" id="bootstrap-css">
+    <script src="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/js/bootstrap.min.js"></script>
 
     <!--Firebase-->
-    
-<script src="https://www.gstatic.com/firebasejs/4.12.1/firebase.js"></script>
-<script>
-  // Initialize Firebase
-  var config = {
+    <script src="https://www.gstatic.com/firebasejs/4.12.1/firebase.js"></script>
+    <script>
+    // Initialize Firebase
+    var config = {
     apiKey: "AIzaSyDPJ2ebtqP83G0CdzdDhbzPx17fRUWeHl4",
     authDomain: "augapp-6957c.firebaseapp.com",
     databaseURL: "https://augapp-6957c.firebaseio.com",
@@ -29,43 +27,54 @@
     messagingSenderId: "585788584223"
   };
   firebase.initializeApp(config);
-</script>
+  </script>
+  <script src="/javascript/augapp.js"></script>
 
-    <!-- Bootstrap CSS -->
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css">
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap-theme.min.css">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+  <title>Resource Aug App</title>
 
-    <title>Resource Aug App</title>
   </head>
+ 
   <body>
-    <div id="main">
-      <nav class="navbar-fluid navbar-default navbar-fixed-top">
-          <a class="navbar-brand" href="#">ResourceAug</a>
-          
-          <div class="container myNavClass" id="navItems" >
+    
+      <div id="main">
+          <nav class="navbar-fluid navbar-default">
+              <a class="navbar-brand" href="#">AugApp</a>
+              <div class="container" id="navItems" >
+                  
+                  <ul class="nav navbar-nav" >
+                     <li><a href="#">Home</a></li>
+                     <p>{{current_user}}</p>
+                 </ul>
+                 <ul class="nav navbar-nav navbar-right">
+                     <li ng-hide="authenticated"><a href="#/register"><span class="glyphicon glyphicon-user"></span> Register</a></li>
+                     <li ng-hide="authenticated" style="float: right"><a href="#/login"><span class="glyphicon glyphicon-log-in"></span> Login</a></li>
+                     <li ng-show="authenticated"><span class="glyphicon glyphicon-log-out" ng-click="signout()" style="cursor : hover"></span> Log Out</li>
+                 </ul>
+              </div>
               
-              <ul class="nav navbar-nav" >
-                 <li><a href="#">Home</a></li>
-                 
-             </ul>
-             <ul class="nav navbar-nav navbar-right ">
-                 <li ng-hide="authenticated"><a href="#/register"><span class="glyphicon glyphicon-user"></span> Register</a></li>
-                 <li ng-hide="authenticated"><a href="#/login"><span class="glyphicon glyphicon-log-in"></span> Login</a></li>
-                 <li ng-show="authenticated"><a href="#" ng-click="signout()"><span class="glyphicon glyphicon-log-out"></span> Log out</a></li>
-                 <li ng-show="authenticated"><a href="#"><span class="	glyphicon glyphicon-user "></span>Logged in as <b style="color:orange">{{current_user}}</b></a></li>
-             </ul>
-             <ul class="nav navbar-nav navbar-right menuIcon">
-                <li><span class="glyphicon glyphicon-menu-hamburger" ng-click="menuHideShow()"></span></li>
-            </ul>
+            </nav>
+            
+          <div ng-view>
           </div>
-        </nav>
-    </div>
-      <div ng-view>
       </div>
-    </body>
+        
+
+
+  </body>
+
+
+
     <footer class="py-5 bg-dark">
         <div class="container">
           <p class="m-0 text-center text-white">Copyright &copy; ResourceAug 2017</p>
+          <h1 class="m-0 text-left text-white">{{xyz}}</h1>
         </div>
     </footer>
 </html>
