@@ -10,71 +10,48 @@
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.6/angular.min.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.6/angular-route.js"></script>
-    <script src ="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.6/angular-cookies.js"></script>
-    <link href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/css/bootstrap-combined.min.css" rel="stylesheet" id="bootstrap-css">
-    <script src="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css">
+      <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap-theme.min.css">
+    <script src="/javascript/augapp.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <!--Firebase-->
-    <script src="https://www.gstatic.com/firebasejs/4.12.1/firebase.js"></script>
-    <script>
-    // Initialize Firebase
-    var config = {
-    apiKey: "AIzaSyDPJ2ebtqP83G0CdzdDhbzPx17fRUWeHl4",
-    authDomain: "augapp-6957c.firebaseapp.com",
-    databaseURL: "https://augapp-6957c.firebaseio.com",
-    projectId: "augapp-6957c",
-    storageBucket: "",
-    messagingSenderId: "585788584223"
-  };
-  firebase.initializeApp(config);
-  </script>
-  <script src="/javascript/augapp.js"></script>
+  <title>GeoLocation Assignment</title>
+  <style>
+        /* Always set the map height explicitly to define the size of the div
+         * element that contains the map. */
+        #map {
+          height: 100%;
+        }
+        /* Optional: Makes the sample page fill the window. */
+        html, body {
+          height: 100%;
+          margin: 0;
+          padding: 0;
+        }
+        #main{
+            text-align: center;
+        }
 
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css">
-	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap-theme.min.css">
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
-  
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-  <title>Resource Aug App</title>
-
+      </style>
   </head>
  
-  <body>
+  <body ng-controller="mainController">
     
       <div id="main">
-          <nav class="navbar-fluid navbar-default">
-              <a class="navbar-brand" href="#">AugApp</a>
-              <div class="container" id="navItems" >
-                  
-                  <ul class="nav navbar-nav" >
-                     <li><a href="#">Home</a></li>
-                     <p>{{current_user}}</p>
-                 </ul>
-                 <ul class="nav navbar-nav navbar-right">
-                     <li ng-hide="authenticated"><a href="#/register"><span class="glyphicon glyphicon-user"></span> Register</a></li>
-                     <li ng-hide="authenticated" style="float: right"><a href="#/login"><span class="glyphicon glyphicon-log-in"></span> Login</a></li>
-                     <li ng-show="authenticated"><span class="glyphicon glyphicon-log-out" ng-click="signout()" style="cursor : hover"></span> Log Out</li>
-                 </ul>
-              </div>
-              
-            </nav>
-            
-          <div ng-view>
-          </div>
+        <form style="padding: 20px 20px; " ng-submit="fetch_coordinates()">
+            <div class="form-group">
+                <input style="width: 70%;margin: 5px auto;" class="form-control"  type="text" ng-model="first" placeholder="enter 1st address" required><br>
+                <input style="width: 70%;margin: 5px auto;" class="form-control" type="text" ng-model="sec" placeholder="enter second address" required><br>
+                <button class="btn btn-default" type="submit">Fetch coordinates</button>
+            </div>
+        </form>
+         <div ng-if="coordinates1 && coordinates2" style="text-align: left;background-color: #d2e0f7;padding: 10px 20px;">
+             <p> coordinates 1 :</p><h4> {{coordinates1}}</h4><br>
+             <p> coordinates 2 :</p><h4> {{coordinates2}}</h4><br>
+             <p>Pin Pointing for :</p><h4>[{{coordinates3.lat}},{{coordinates3.lng}}] :</h4> {{coordinates3.formatted_address}}
+             <div style="width: 100%; min-height: 300px;border: 1px solid black; margin-top: 20px; padding: 10px 10px" id="map" class="google-map" lat="{{coordinates3.lat}}" long="{{coordinates3.lng}}"></div>
+         </div>
       </div>
-        
-
-
   </body>
-
-
-
-    <footer class="py-5 bg-dark">
-        <div class="container">
-          <p class="m-0 text-center text-white">Copyright &copy; ResourceAug 2017</p>
-          <h1 class="m-0 text-left text-white">{{xyz}}</h1>
-        </div>
-    </footer>
 </html>

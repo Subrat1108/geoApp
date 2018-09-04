@@ -1,168 +1,86 @@
 "use strict";
-var app = angular.module('augApp', ['ngRoute', 'ngCookies']).run(function($http, $rootScope,$cookieStore){
+var app = angular.module('augApp', ['ngRoute']);
+app.controller("mainController", function($scope,$http){
 
-	$rootScope.initApp = function() {
-		// Listening for auth state changes.
-		// [START authstatelistener]
-		firebase.auth().onAuthStateChanged(function(user) {
-		  if (user) {
-			// User is signed in.
-			$cookieStore.put('email', user.email);
-			$cookieStore.put('emailVerified', user.emailVerified);
-			$cookieStore.put('uid', user.uid);
-			$cookieStore.put('authentication', true);
-		  } else {
-			$cookieStore.put('authentication', false);
-		  }
-		  
+	$scope.fetch_coordinates = function(){
+		$http.get('https://maps.googleapis.com/maps/api/geocode/json?address='+$scope.first+'&key=AIzaSyAOKdl_94CDrw07Sz3uX8SHpzJFagopRgs').then(function(res){
+			$scope.coordinates1 = res.data.results[0].geometry.location;
+			$http.get('https://maps.googleapis.com/maps/api/geocode/json?address='+$scope.sec+'&key=AIzaSyAOKdl_94CDrw07Sz3uX8SHpzJFagopRgs').then(function(res){
+			$scope.coordinates2 = res.data.results[0].geometry.location;
+			$scope.coordinates3={};
+			$scope.coordinates3.lat=($scope.coordinates2.lat+$scope.coordinates1.lat)/2;
+			$scope.coordinates3.lng=($scope.coordinates2.lng+$scope.coordinates1.lng)/2;
+			$http.get('https://maps.googleapis.com/maps/api/geocode/json?latlng='+$scope.coordinates3.lat+','+$scope.coordinates3.lng+'&key=AIzaSyAOKdl_94CDrw07Sz3uX8SHpzJFagopRgs').then(function(res){
+				$scope.coordinates3.formatted_address = res.data.results[0].formatted_address;
+			});
 		});
+		});
+	}
+});
+app.service('loadGoogleMapAPI', ['$window', '$q', 
+    function ( $window, $q ) {
 
-    $rootScope.user_id = $cookieStore.get('uid');
-	$rootScope.authenticated = $cookieStore.get('authentication');
-	$rootScope.emailVerified = $cookieStore.get('emailVerified');
-    };
+        var deferred = $q.defer();
 
-	window.onload = function(){
-		$rootScope.initApp();
-		console.log($rootScope.user_id);
+        // Load Google map API script
+        function loadScript() {  
+            // Use global document since Angular's $document is weak
+            var script = document.createElement('script');
+            script.src = '//maps.googleapis.com/maps/api/js?key=AIzaSyDT_SZX9qDRkhUxfU6htemGWL0QuKJbEjY&sensor=false&language=en&callback=initMap';
+            document.body.appendChild(script);
+        }
+
+        // Script loaded callback, send resolve
+        $window.initMap = function () {
+            deferred.resolve();
+        }
+
+        loadScript();
+
+        return deferred.promise;
+		}]);
+		
+		// Google Map
+app.directive('googleMap', ['$rootScope', 'loadGoogleMapAPI', 
+function( $rootScope, loadGoogleMapAPI ) {  
+
+		return {
+				restrict: 'C', // restrict by class name
+				scope: {
+						mapId: '@id', // map ID
+						lat: '@',     // latitude
+						long: '@'     // longitude
+				},
+				link: function( $scope, elem, attrs ) {
+
+						// Check if latitude and longitude are specified
+						if ( angular.isDefined($scope.lat) && angular.isDefined($scope.long) ) {
+
+								// Initialize the map
+								$scope.initialize = function() {                                        
+										$scope.location = new google.maps.LatLng($scope.lat, $scope.long);
+
+										$scope.mapOptions = {
+												zoom: 12,
+												center: $scope.location
+										};
+
+										$scope.map = new google.maps.Map(document.getElementById($scope.mapId), $scope.mapOptions);
+
+										new google.maps.Marker({
+												position: $scope.location,
+												map: $scope.map,
+										});
+								}
+
+								// Loads google map script
+								loadGoogleMapAPI.then(function () {
+										// Promised resolved
+										$scope.initialize();
+								}, function () {
+										// Promise rejected
+								});
+						}
+				}
 		};
-	
-  
-	  $rootScope.signout = function(){
-		firebase.auth().signOut();
-		$cookieStore.remove('uid');
-		$cookieStore.remove('authentication');
-		$rootScope.initApp();
-	};
-});
-
-/* route configuration*/
-
-app.config(function($routeProvider){
-    $routeProvider
-    .when('/', {
-			templateUrl: 'main.html',
-			controller: 'mainController'
-		})
-		
-		.when('/login', {
-			templateUrl: 'login.html',
-			controller: 'authController'
-		})
-		
-		.when('/register', {
-			templateUrl: 'register.html',
-			controller: 'authController'
-		})
-
-});
-
-/* controllers*/
-
-app.controller("authController", function($scope,$cookieStore,$rootScope,$location,$route){
-
-	$scope.user = {email: '', password: '', userName: '', company:''};
-	$scope.error_message = '';
-
-	$scope.login = function() {
-		  
-		  firebase.auth().signInWithEmailAndPassword($scope.user.email, $scope.user.password).catch(function(error) {
-			// Handle Errors here.
-			var  errorCode = error.code;
-			 var errorMessage = error.message;
-			// [START_EXCLUDE]
-			if (errorCode === 'auth/wrong-password') {
-			  alert('Wrong password.');
-			} else {
-			  alert(errorMessage);
-			}
-			console.log(error);
-			// [END_EXCLUDE]
-		  }).then(function(){
-
-				$rootScope.initApp();
-				window.location.reload();
-
-			});
-
-			$location.path('/');
-	  };
-	  /**
-	   * Handles the sign up button press.
-	   */
-	  $scope.register = function() {
-		if ($scope.user.email.length < 4) {
-		  alert('Please enter an email address.');
-		  return;
-		}
-		if ($scope.user.password.length < 4) {
-		  alert('Please enter a password.');
-		  return;
-		}
-		// Sign in with email and pass.
-		// [START createwithemail]
-		firebase.auth().createUserWithEmailAndPassword($scope.user.email, $scope.user.password).catch(function(error) {
-		  // Handle Errors here.
-		  var errorCode = error.code;
-		  var errorMessage = error.message;
-		  // [START_EXCLUDE]
-		  if (errorCode == 'auth/weak-password') {
-			alert('The password is too weak.');
-		  } else {
-			alert(errorMessage);
-		  }
-		  console.log(error);
-		  // [END_EXCLUDE]
-		}).then(function() {
-			// [START sendemailverification]
-			firebase.auth().currentUser.sendEmailVerification().then(function() {
-			  // Email Verification sent!
-			  // [START_EXCLUDE]
-			  alert('Email Verification Sent!');
-			  // [END_EXCLUDE]
-			});
-		}).then(function(){
-
-			$rootScope.initApp();
-			window.location.reload();
-
-		});
-
-		$location.path('/');
-	  };
-	  
-	  
-		
-	  
-	  
-	   $scope.sendPasswordReset= function() {
-		var email = $scope.email
-		// [START sendpasswordemail]
-		firebase.auth().sendPasswordResetEmail(email).then(function() {
-		  // Password Reset Email Sent!
-		  // [START_EXCLUDE]
-		  alert('Password Reset Email Sent!');
-		  // [END_EXCLUDE]
-		}).catch(function(error) {
-		  // Handle Errors here.
-		  var errorCode = error.code;
-		  var errorMessage = error.message;
-		  // [START_EXCLUDE]
-		  if (errorCode == 'auth/invalid-email') {
-			alert(errorMessage);
-		  } else if (errorCode == 'auth/user-not-found') {
-			alert(errorMessage);
-		  }
-		  console.log(error);
-		  // [END_EXCLUDE]
-		});
-		// [END sendpasswordemail];
-	  }
-
-});
-
-app.controller("mainController", function($scope,$cookieStore){
-});
-
-
-/* services*/
+}]);
